@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scrapersvc-deployment
+  labels:
+    app: scrapersvc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scrapersvc
+  template:
+    metadata:
+      labels:
+        app: scrapersvc
+    spec:
+      containers:
+        - name: scrapersvc-container
+          image: chasec130/scraperservice:latest
+          imagePullPolicy: Always
+          env:
+            - name: API_PORT
+              value: "8080"
+            - name: METRICS_PORT
+              value: "9095"
+          ports:
+            - containerPort: 8080
+              name: api-port
+            - containerPort: 9095
+              name: metrics-port
+        - name: prometheus-container
+          image: prom/prometheus:latest
+          imagePullPolicy: Always
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+          ports:
+            - containerPort: 9090
+              name: prometheus-port
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus/prometheus.yml
+              subPath: prometheus.yml
+      volumes:
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config

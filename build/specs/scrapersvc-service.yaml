@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: scrapersvc-service
+  labels:
+    app: scrapersvc
+spec:
+  selector:
+    app: scrapersvc
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+    - port: 9095
+      targetPort: 9095
+      protocol: TCP
+      name: metrics
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+      name: prometheus
+  type: LoadBalancer
